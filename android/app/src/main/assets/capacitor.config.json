@@ -1,0 +1,7 @@
+{
+  "appId": "com.der-codder.ionic.bookit",
+  "appName": "bookit",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "www"
+}
