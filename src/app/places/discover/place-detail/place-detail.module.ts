@@ -1,9 +1,14 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { SharedModule, CreateBookingComponent } from '@app/shared';
+import {
+  SharedModule,
+  CreateBookingComponent,
+  MapModalComponent
+} from '@app/shared';
 
 import { PlaceDetailPage } from './place-detail.page';
+import { PlaceDetailsViewComponent } from './place-details-view/place-details-view.component';
 
 const routes: Routes = [
   {
@@ -14,7 +19,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forChild(routes), SharedModule],
-  declarations: [PlaceDetailPage],
-  entryComponents: [CreateBookingComponent]
+  declarations: [PlaceDetailPage, PlaceDetailsViewComponent],
+  entryComponents: [CreateBookingComponent, MapModalComponent]
 })
 export class PlaceDetailPageModule {}
