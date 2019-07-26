@@ -4,8 +4,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { PlacesService } from '../../places.service';
-import { PlaceLocation } from '../../../model/location.model';
+import { PlacesService, PlaceLocation } from '@app/core';
 
 function base64toBlob(base64Data: any, contentType: any) {
   contentType = contentType || '';

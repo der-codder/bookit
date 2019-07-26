@@ -2,8 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { IonItemSliding, LoadingController } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
-import { BookingService } from './boking.service';
-import { Booking } from '../model/booking.model';
+import { BookingService, Booking } from '@app/core';
 
 @Component({
   selector: 'app-bookings',

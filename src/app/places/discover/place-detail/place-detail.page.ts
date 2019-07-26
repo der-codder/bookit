@@ -10,12 +10,8 @@ import {
 import { Subscription } from 'rxjs';
 import { take, switchMap } from 'rxjs/operators';
 
-import { Place } from '../../../model/place.model';
-import { PlacesService } from '../../places.service';
-import { CreateBookingComponent } from '../../../bookings/create-booking/create-booking.component';
-import { BookingService } from '../../../bookings/boking.service';
-import { AuthService } from './../../../auth/auth.service';
-import { MapModalComponent } from '../../../shared/map-modal/map-modal.component';
+import { Place, AuthService, PlacesService, BookingService } from '@app/core';
+import { CreateBookingComponent, MapModalComponent } from '@app/shared';
 
 @Component({
   selector: 'app-place-detail',

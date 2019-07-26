@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { take, tap, delay, map, switchMap } from 'rxjs/operators';
+import { take, tap, map, switchMap } from 'rxjs/operators';
 
 import { Booking } from '../model/booking.model';
-import { AuthService } from '../auth/auth.service';
+import { AuthService } from './auth.service';
 
 interface BookingResource {
   bookedFrom: string;

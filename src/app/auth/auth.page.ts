@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { LoadingController, AlertController } from '@ionic/angular';
 import { Observable } from 'rxjs';
 
-import { AuthService, AuthResponseData } from './auth.service';
+import { AuthService, AuthResponseData } from '@app/core';
 
 @Component({
   selector: 'app-auth',

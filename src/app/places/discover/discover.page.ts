@@ -1,11 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { SegmentChangeEventDetail } from '@ionic/core';
 import { Subscription } from 'rxjs';
-
-import { PlacesService } from '../places.service';
-import { Place } from '../../model/place.model';
-import { AuthService } from '../../auth/auth.service';
 import { take } from 'rxjs/operators';
+
+import { PlacesService, Place, AuthService } from '@app/core';
 
 @Component({
   selector: 'app-discover',

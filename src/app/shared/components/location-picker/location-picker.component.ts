@@ -9,9 +9,10 @@ import {
 import { map, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 
-import { MapModalComponent } from '../../map-modal/map-modal.component';
+import { PlaceLocation } from '@app/core';
+
+import { MapModalComponent } from '../map-modal/map-modal.component';
 import { environment } from '../../../../environments/environment';
-import { PlaceLocation } from '../../../model/location.model';
 
 @Component({
   selector: 'app-location-picker',

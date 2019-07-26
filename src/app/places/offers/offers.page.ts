@@ -2,11 +2,9 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { IonItemSliding } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-
-import { AuthService } from './../../auth/auth.service';
-import { PlacesService } from '../places.service';
-import { Place } from '../../model/place.model';
 import { take } from 'rxjs/operators';
+
+import { AuthService, PlacesService, Place } from '@app/core';
 
 @Component({
   selector: 'app-offers',

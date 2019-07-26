@@ -8,8 +8,7 @@ import {
 } from '@ionic/angular';
 import { Subscription } from 'rxjs';
 
-import { Place } from '../../../model/place.model';
-import { PlacesService } from '../../places.service';
+import { Place, PlacesService } from '@app/core';
 
 @Component({
   selector: 'app-edit-offer',

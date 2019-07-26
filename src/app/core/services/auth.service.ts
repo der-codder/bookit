@@ -4,7 +4,8 @@ import { Plugins } from '@capacitor/core';
 import { Observable, BehaviorSubject, from } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
-import { environment } from './../../environments/environment.prod';
+import { environment } from '@env/environment';
+
 import { User } from '../model/user.model';
 
 export interface AuthResponseData {
@@ -30,11 +31,11 @@ const AUTH_DATA_STORAGE_KEY = 'authData';
   providedIn: 'root'
 })
 export class AuthService implements OnDestroy {
-  private _user = new BehaviorSubject<User>(null);
+  private user = new BehaviorSubject<User>(null);
   private activeLogoutTimer: any;
 
   get userIsAuthenticated(): Observable<boolean> {
-    return this._user.asObservable().pipe(
+    return this.user.asObservable().pipe(
       map(user => {
         if (user) {
           return !!user.token;
@@ -46,7 +47,7 @@ export class AuthService implements OnDestroy {
   }
 
   get userId(): Observable<string> {
-    return this._user.asObservable().pipe(
+    return this.user.asObservable().pipe(
       map(user => {
         if (user) {
           return user.id;
@@ -58,7 +59,7 @@ export class AuthService implements OnDestroy {
   }
 
   get token(): Observable<string> {
-    return this._user.asObservable().pipe(
+    return this.user.asObservable().pipe(
       map(user => {
         if (user) {
           return user.token;
@@ -93,7 +94,7 @@ export class AuthService implements OnDestroy {
       }),
       tap(user => {
         if (user) {
-          this._user.next(user);
+          this.user.next(user);
           this.autoLogout(user.tokenDuration);
         }
       }),
@@ -129,7 +130,7 @@ export class AuthService implements OnDestroy {
     if (this.activeLogoutTimer) {
       clearTimeout(this.activeLogoutTimer);
     }
-    this._user.next(null);
+    this.user.next(null);
     Plugins.Storage.remove({ key: AUTH_DATA_STORAGE_KEY });
   }
 
@@ -158,7 +159,7 @@ export class AuthService implements OnDestroy {
       userData.idToken,
       expirationDate
     );
-    this._user.next(user);
+    this.user.next(user);
     this.autoLogout(user.tokenDuration);
     this.storeAuthData({
       userId: userData.localId,

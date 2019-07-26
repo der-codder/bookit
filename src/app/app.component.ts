@@ -1,12 +1,12 @@
-import { Subscription } from 'rxjs';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 import { Platform } from '@ionic/angular';
 import { Capacitor, Plugins, AppState } from '@capacitor/core';
 
-import { AuthService } from './auth/auth.service';
-import { take } from 'rxjs/operators';
+import { AuthService } from '@app/core';
 
 @Component({
   selector: 'app-root',
