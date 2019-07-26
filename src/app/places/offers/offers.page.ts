@@ -3,8 +3,10 @@ import { IonItemSliding } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 
+import { AuthService } from './../../auth/auth.service';
 import { PlacesService } from '../places.service';
 import { Place } from '../../model/place.model';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-offers',
@@ -16,11 +18,17 @@ export class OffersPage implements OnInit, OnDestroy {
   isLoading = false;
   private placesSub: Subscription;
 
-  constructor(private placesService: PlacesService, private router: Router) {}
+  constructor(
+    private placesService: PlacesService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.placesSub = this.placesService.places.subscribe(places => {
-      this.offers = places;
+      this.authService.userId.pipe(take(1)).subscribe(userId => {
+        this.offers = places.filter(place => place.userId === userId);
+      });
     });
   }
 
