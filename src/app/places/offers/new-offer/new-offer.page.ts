@@ -1,6 +1,6 @@
 import { switchMap } from 'rxjs/operators';
 import { LoadingController } from '@ionic/angular';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -30,7 +30,8 @@ function base64toBlob(base64Data: any, contentType: any) {
 @Component({
   selector: 'app-new-offer',
   templateUrl: './new-offer.page.html',
-  styleUrls: ['./new-offer.page.scss']
+  styleUrls: ['./new-offer.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NewOfferPage implements OnInit {
   newOfferForm: FormGroup;
