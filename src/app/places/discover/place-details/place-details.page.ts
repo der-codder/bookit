@@ -12,12 +12,12 @@ interface PlaceDetailsData {
 }
 
 @Component({
-  selector: 'app-place-detail',
-  templateUrl: './place-detail.page.html',
-  styleUrls: ['./place-detail.page.scss'],
+  selector: 'app-place-details',
+  templateUrl: './place-details.page.html',
+  styleUrls: ['./place-details.page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PlaceDetailPage implements OnInit {
+export class PlaceDetailsPage implements OnInit {
   place$: Observable<PlaceDetailsData>;
   loadingError$ = new Subject<boolean>();
 

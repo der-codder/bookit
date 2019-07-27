@@ -7,19 +7,19 @@ import {
   MapModalComponent
 } from '@app/shared';
 
-import { PlaceDetailPage } from './place-detail.page';
+import { PlaceDetailsPage } from './place-details.page';
 import { PlaceDetailsViewComponent } from './place-details-view/place-details-view.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: PlaceDetailPage
+    component: PlaceDetailsPage
   }
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes), SharedModule],
-  declarations: [PlaceDetailPage, PlaceDetailsViewComponent],
+  declarations: [PlaceDetailsPage, PlaceDetailsViewComponent],
   entryComponents: [CreateBookingComponent, MapModalComponent]
 })
-export class PlaceDetailPageModule {}
+export class PlaceDetailsPageModule {}
