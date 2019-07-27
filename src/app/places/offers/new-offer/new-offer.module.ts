@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { SharedModule } from '@app/shared';
+import { SharedModule, MapModalComponent } from '@app/shared';
 
 import { NewOfferPage } from './new-offer.page';
 
@@ -14,6 +14,7 @@ const routes: Routes = [
 
 @NgModule({
   imports: [SharedModule, RouterModule.forChild(routes)],
-  declarations: [NewOfferPage]
+  declarations: [NewOfferPage],
+  entryComponents: [MapModalComponent]
 })
 export class NewOfferPageModule {}

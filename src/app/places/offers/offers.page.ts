@@ -1,20 +1,20 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IonItemSliding } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { take, switchMap, map } from 'rxjs/operators';
 
 import { AuthService, PlacesService, Place } from '@app/core';
 
 @Component({
   selector: 'app-offers',
   templateUrl: './offers.page.html',
-  styleUrls: ['./offers.page.scss']
+  styleUrls: ['./offers.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class OffersPage implements OnInit, OnDestroy {
-  offers: Place[];
+export class OffersPage implements OnInit {
+  offers$: Observable<Place[]>;
   isLoading = false;
-  private placesSub: Subscription;
 
   constructor(
     private placesService: PlacesService,
@@ -23,11 +23,17 @@ export class OffersPage implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.placesSub = this.placesService.places.subscribe(places => {
-      this.authService.userId.pipe(take(1)).subscribe(userId => {
-        this.offers = places.filter(place => place.userId === userId);
-      });
-    });
+    let fetchedUserId: string;
+    this.offers$ = this.authService.userId.pipe(
+      take(1),
+      switchMap(userId => {
+        fetchedUserId = userId;
+        return this.placesService.places;
+      }),
+      map(places => {
+        return places.filter(place => place.userId === fetchedUserId);
+      })
+    );
   }
 
   ionViewWillEnter() {
@@ -37,14 +43,8 @@ export class OffersPage implements OnInit, OnDestroy {
     });
   }
 
-  onEdit(offerId: string, slidingItem: IonItemSliding) {
-    slidingItem.close();
+  async onEdit(offerId: string, slidingItem: IonItemSliding) {
+    await slidingItem.close();
     this.router.navigate(['/', 'places', 'tabs', 'offers', 'edit', offerId]);
-  }
-
-  ngOnDestroy() {
-    if (this.placesSub) {
-      this.placesSub.unsubscribe();
-    }
   }
 }
