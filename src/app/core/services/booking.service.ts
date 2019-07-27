@@ -22,7 +22,7 @@ interface BookingResource {
   providedIn: 'root'
 })
 export class BookingService {
-  private _bookings = new BehaviorSubject<Booking[]>([]);
+  private _bookings = new BehaviorSubject<Booking[]>(null);
 
   constructor(private authService: AuthService, private http: HttpClient) {}
 
@@ -33,6 +33,9 @@ export class BookingService {
   fetchBookings(): Observable<any[]> {
     let fetchedUserId: string;
     return this.authService.userId.pipe(
+      tap(() => {
+        this._bookings.next(null);
+      }),
       take(1),
       switchMap(userId => {
         if (!userId) {

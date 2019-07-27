@@ -1,50 +1,35 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IonItemSliding, LoadingController } from '@ionic/angular';
-import { Subscription } from 'rxjs';
 
 import { BookingService, Booking } from '@app/core';
 
 @Component({
   selector: 'app-bookings',
   templateUrl: './bookings.page.html',
-  styleUrls: ['./bookings.page.scss']
+  styleUrls: ['./bookings.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class BookingsPage implements OnInit, OnDestroy {
-  loadedBookings: Booking[];
-  isLoading = false;
-  private bookingsSub: Subscription;
-
+export class BookingsPage implements OnInit {
   constructor(
-    private bookingService: BookingService,
+    public bookingService: BookingService,
     private loadingCtrl: LoadingController
   ) {}
 
-  ngOnInit() {
-    this.bookingsSub = this.bookingService.bookings.subscribe(bookings => {
-      this.loadedBookings = bookings;
-    });
-  }
+  ngOnInit() {}
 
   ionViewWillEnter() {
-    this.isLoading = true;
-    this.bookingService
-      .fetchBookings()
-      .subscribe(() => (this.isLoading = false));
+    this.bookingService.fetchBookings().subscribe(() => {});
   }
 
-  onCancelBooking(bookingId: string, slidingItem: IonItemSliding) {
-    slidingItem.close();
-    this.loadingCtrl.create({ message: 'Cancelling...' }).then(loadingEl => {
-      loadingEl.present();
-      this.bookingService.cancelBooking(bookingId).subscribe(() => {
-        loadingEl.dismiss();
-      });
+  async onCancelBooking(bookingId: string, slidingItem: IonItemSliding) {
+    await slidingItem.close();
+    const loadingEl = await this.loadingCtrl.create({
+      message: 'Cancelling...'
     });
-  }
+    await loadingEl.present();
 
-  ngOnDestroy() {
-    if (this.bookingsSub) {
-      this.bookingsSub.unsubscribe();
-    }
+    this.bookingService.cancelBooking(bookingId).subscribe(async () => {
+      await loadingEl.dismiss();
+    });
   }
 }

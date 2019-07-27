@@ -10,33 +10,37 @@
 <ion-content>
   <ion-grid>
     <ion-row>
-      <ion-col size-md="6" offset-md="3" text-center *ngIf="isLoading">
-        <ion-spinner color="primary"></ion-spinner>
-      </ion-col>
-      <ion-col size-md="6" offset-md="3" text-center
-        *ngIf="!isLoading && (!loadedBookings || loadedBookings.length <= 0)">
-        <p>No bookings found!</p>
-      </ion-col>
-      <ion-col size-md="6" offset-md="3" *ngIf="!isLoading && loadedBookings && loadedBookings.length > 0">
-        <ion-list>
-          <ion-item-sliding *ngFor="let booking of loadedBookings" #slidingItem>
-            <ion-item>
-              <ion-avatar slot="start">
-                <ion-img [src]="booking.placeImage"></ion-img>
-              </ion-avatar>
-              <ion-label>
-                <h3>{{ booking.placeTitle }}</h3>
-                <p>Guests: {{ booking.guestNumber }}</p>
-              </ion-label>
-            </ion-item>
-            <ion-item-options>
-              <ion-item-option color="danger" (click)="onCancelBooking(booking.id, slidingItem)">
-                <ion-icon name="trash" slot="icon-only"></ion-icon>
-              </ion-item-option>
-            </ion-item-options>
-          </ion-item-sliding>
-        </ion-list>
+      <ion-col size-md="6" offset-md="3">
+        <ng-container *ngIf="bookingService.bookings | async as bookings; else loading">
+          <div *ngIf="bookings.length <= 0" text-center>
+            <p>You have no bookings, yet!</p>
+          </div>
+          <ion-list *ngIf="bookings.length > 0">
+            <ion-item-sliding *ngFor="let booking of bookings" #slidingItem>
+              <ion-item>
+                <ion-avatar slot="start">
+                  <ion-img [src]="booking.placeImage"></ion-img>
+                </ion-avatar>
+                <ion-label>
+                  <h3>{{ booking.placeTitle }}</h3>
+                  <p>Guests: {{ booking.guestNumber }}</p>
+                </ion-label>
+              </ion-item>
+              <ion-item-options>
+                <ion-item-option color="danger" (click)="onCancelBooking(booking.id, slidingItem)">
+                  <ion-icon name="trash" slot="icon-only"></ion-icon>
+                </ion-item-option>
+              </ion-item-options>
+            </ion-item-sliding>
+          </ion-list>
+        </ng-container>
       </ion-col>
     </ion-row>
   </ion-grid>
 </ion-content>
+
+<ng-template #loading>
+  <div text-center>
+    <ion-spinner color="primary"></ion-spinner>
+  </div>
+</ng-template>
