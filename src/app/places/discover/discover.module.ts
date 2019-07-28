@@ -4,7 +4,8 @@ import { Routes, RouterModule } from '@angular/router';
 import { SharedModule } from '@app/shared';
 
 import { DiscoverPage } from './discover.page';
-import { PlacesListComponent } from './places-list/places-list.component';
+import { PlacesListComponent } from './components/places-list.component';
+import { FeaturedPlaceComponent } from './components/featured-place.component';
 
 const routes: Routes = [
   {
@@ -15,6 +16,6 @@ const routes: Routes = [
 
 @NgModule({
   imports: [SharedModule, RouterModule.forChild(routes)],
-  declarations: [DiscoverPage, PlacesListComponent]
+  declarations: [DiscoverPage, PlacesListComponent, FeaturedPlaceComponent]
 })
 export class DiscoverPageModule {}

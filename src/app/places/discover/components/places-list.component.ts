@@ -13,7 +13,6 @@ import { Place } from '@app/core';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlacesListComponent implements OnInit {
-  @Input() featuredPlace: Place;
   @Input() places: Place[];
 
   constructor() {}
