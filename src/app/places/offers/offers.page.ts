@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IonItemSliding } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { take, switchMap, map } from 'rxjs/operators';
+import { map, withLatestFrom } from 'rxjs/operators';
 
 import { AuthService, PlacesService, Place } from '@app/core';
 
@@ -14,7 +14,6 @@ import { AuthService, PlacesService, Place } from '@app/core';
 })
 export class OffersPage implements OnInit {
   offers$: Observable<Place[]>;
-  isLoading = false;
 
   constructor(
     private placesService: PlacesService,
@@ -23,24 +22,19 @@ export class OffersPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    let fetchedUserId: string;
-    this.offers$ = this.authService.userId.pipe(
-      take(1),
-      switchMap(userId => {
-        fetchedUserId = userId;
-        return this.placesService.places;
-      }),
-      map(places => {
-        return places.filter(place => place.userId === fetchedUserId);
+    this.offers$ = this.placesService.places.pipe(
+      withLatestFrom(this.authService.userId),
+      map(([places, userId]) => {
+        if (!places) {
+          return null;
+        }
+        return places.filter(place => place.userId === userId);
       })
     );
   }
 
   ionViewWillEnter() {
-    this.isLoading = true;
-    this.placesService.fetchPlaces().subscribe(() => {
-      this.isLoading = false;
-    });
+    this.placesService.fetchPlaces().subscribe(() => {});
   }
 
   async onEdit(offerId: string, slidingItem: IonItemSliding) {
