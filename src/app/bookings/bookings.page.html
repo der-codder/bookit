@@ -11,7 +11,7 @@
   <ion-grid>
     <ion-row>
       <ion-col size-md="6" offset-md="3">
-        <ng-container *ngIf="bookingService.bookings | async as bookings; else loading">
+        <ng-container *ngIf="bookingService.bookings$ | async as bookings; else loading">
           <div *ngIf="bookings.length <= 0" text-center>
             <p>You have no bookings, yet!</p>
           </div>

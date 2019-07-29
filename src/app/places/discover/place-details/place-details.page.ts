@@ -6,9 +6,9 @@ import { take, switchMap, catchError, map } from 'rxjs/operators';
 
 import { Place, AuthService, PlacesService } from '@app/core';
 
-interface PlaceDetailsData {
+interface PlaceViewModel {
   place: Place;
-  userId: string;
+  isBookable: boolean;
 }
 
 @Component({
@@ -18,7 +18,7 @@ interface PlaceDetailsData {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlaceDetailsPage implements OnInit {
-  place$: Observable<PlaceDetailsData>;
+  place$: Observable<PlaceViewModel>;
   loadingError$ = new Subject<boolean>();
 
   constructor(
@@ -35,18 +35,17 @@ export class PlaceDetailsPage implements OnInit {
         return;
       }
 
-      let fetchedUserId: string;
-      this.place$ = this.authService.userId.pipe(
+      this.place$ = this.authService.user$.pipe(
         take(1),
-        switchMap(userId => {
-          if (!userId) {
-            throw new Error('User id is empty');
+        switchMap(user => {
+          if (!user) {
+            throw new Error('User is empty!');
           }
-          fetchedUserId = userId;
-          return this.placesService.getPlace(paramMap.get('placeId'));
-        }),
-        map<Place, PlaceDetailsData>(place => {
-          return { place, userId: fetchedUserId };
+          return this.placesService.getPlace(paramMap.get('placeId')).pipe(
+            map(place => {
+              return { place, isBookable: place.userId !== user.id };
+            })
+          );
         }),
         catchError(error => {
           console.error('Error loading place details.', error);

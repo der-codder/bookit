@@ -73,7 +73,6 @@ export class NewOfferPage implements OnInit {
     if (!this.newOfferForm.valid || !this.newOfferForm.get('image').value) {
       return;
     }
-    console.log(this.newOfferForm.value);
     this.loadingCtrl
       .create({
         message: 'Adding a new place...'

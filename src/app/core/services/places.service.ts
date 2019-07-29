@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, of } from 'rxjs';
-import { take, map, tap, switchMap } from 'rxjs/operators';
+import { Model, ModelFactory } from '@angular-extensions/model';
+import { BehaviorSubject, Observable, of, combineLatest } from 'rxjs';
+import { take, map, tap, switchMap, mapTo } from 'rxjs/operators';
 
 import { AuthService } from './auth.service';
 import { Place } from '../model/place.model';
@@ -22,20 +23,30 @@ interface PlaceResource {
   providedIn: 'root'
 })
 export class PlacesService {
-  private _places = new BehaviorSubject<Place[]>([]);
+  private placesModel: Model<Place[]>;
+  places$: Observable<Place[]>;
 
-  get places(): Observable<Place[]> {
-    return this._places.asObservable();
+  constructor(
+    private authService: AuthService,
+    private http: HttpClient,
+    private modelFactory: ModelFactory<Place[]>
+  ) {
+    this.placesModel = this.modelFactory.create(null);
+    this.places$ = this.placesModel.data$;
   }
 
-  constructor(private authService: AuthService, private http: HttpClient) {}
-
-  fetchPlaces() {
-    return this.authService.token.pipe(
+  fetchPlaces(): Observable<boolean> {
+    return this.authService.user$.pipe(
+      tap(() => {
+        // purge places to notify about loading
+        this.placesModel.set(null);
+      }),
       take(1),
-      switchMap(token => {
+      switchMap(user => {
         return this.http.get<{ [key: string]: PlaceResource }>(
-          `https://ionic-booking-634af.firebaseio.com/offered-places.json?auth=${token}`
+          `https://ionic-booking-634af.firebaseio.com/offered-places.json?auth=${
+            user.token
+          }`
         );
       }),
       map(resData => {
@@ -48,17 +59,21 @@ export class PlacesService {
         return places;
       }),
       tap(places => {
-        this._places.next(places);
-      })
+        console.log('-- fetchPlaces.set(places)');
+        this.placesModel.set(places);
+      }),
+      mapTo(true)
     );
   }
 
   getPlace(id: string): Observable<Place> {
-    return this.authService.token.pipe(
+    return this.authService.user$.pipe(
       take(1),
-      switchMap(token => {
+      switchMap(user => {
         return this.http.get<PlaceResource>(
-          `https://ionic-booking-634af.firebaseio.com/offered-places/${id}.json?auth=${token}`
+          `https://ionic-booking-634af.firebaseio.com/offered-places/${id}.json?auth=${
+            user.token
+          }`
         );
       }),
       map(placeResource => this.mapPlaceResourceToPlace(id, placeResource))
@@ -73,22 +88,14 @@ export class PlacesService {
     availableTo: Date,
     location: PlaceLocation,
     imageUrl: string
-  ): Observable<Place[]> {
-    let generatedId: string;
-    let fetchedUserId: string;
-    let newPlace: Place;
-    return this.authService.userId.pipe(
+  ): Observable<boolean> {
+    return this.authService.user$.pipe(
       take(1),
-      switchMap(userId => {
-        if (!userId) {
-          throw new Error('User id is empty');
+      switchMap(user => {
+        if (!user) {
+          throw new Error('User is empty!');
         }
-        fetchedUserId = userId;
-        return this.authService.token;
-      }),
-      take(1),
-      switchMap(token => {
-        newPlace = new Place(
+        const newPlace = new Place(
           null,
           title,
           description,
@@ -96,86 +103,115 @@ export class PlacesService {
           price,
           availableFrom,
           availableTo,
-          fetchedUserId,
+          user.id,
           location
         );
-        return this.http.post<{ name: string }>(
-          `https://ionic-booking-634af.firebaseio.com/offered-places.json?auth=${token}`,
-          newPlace
-        );
+        return this.http
+          .post<{ name: string }>(
+            `https://ionic-booking-634af.firebaseio.com/offered-places.json?auth=${
+              user.token
+            }`,
+            newPlace
+          )
+          .pipe(
+            map(resData => {
+              newPlace.id = resData.name;
+              return newPlace;
+            })
+          );
       }),
-      switchMap(resData => {
-        generatedId = resData.name;
-        return this.places;
-      }),
-      take(1),
-      tap(places => {
-        newPlace.id = generatedId;
-        this._places.next(places.concat(newPlace));
-      })
+      mapTo(true)
     );
   }
 
-  updatePlace(placeId: string, title: string, description: string) {
-    let updatedPlaces: Place[];
-    let fetchedToken: string;
-    return this.authService.token.pipe(
+  updatePlace(
+    placeId: string,
+    newTitle: string,
+    newDescription: string
+  ): Observable<boolean> {
+    return combineLatest([
+      this.authService.user$,
+      this.places$.pipe(
+        take(1),
+        switchMap(places => {
+          if (!places || places.length <= 0) {
+            return this.fetchPlaces();
+          } else {
+            return of(true);
+          }
+        })
+      )
+    ]).pipe(
       take(1),
-      switchMap(token => {
-        fetchedToken = token;
-        return this.places;
-      }),
-      take(1),
-      switchMap(places => {
-        if (!places || places.length <= 0) {
-          return this.fetchPlaces();
-        } else {
-          return of(places);
-        }
-      }),
-      switchMap(places => {
-        const updatedPlaceIndex = places.findIndex(pl => pl.id === placeId);
-        updatedPlaces = [...places];
-        const oldPlace = updatedPlaces[updatedPlaceIndex];
-        updatedPlaces[updatedPlaceIndex] = new Place(
-          oldPlace.id,
-          title,
-          description,
-          oldPlace.imageUrl,
-          oldPlace.price,
-          oldPlace.availableFrom,
-          oldPlace.availableTo,
-          oldPlace.userId,
-          oldPlace.location
+      switchMap(([user, isPlacesFethed]) => {
+        const updatedPlace = this.getUpdatedPlace(
+          placeId,
+          newTitle,
+          newDescription
         );
         return this.http.put(
-          `https://ionic-booking-634af.firebaseio.com/offered-places/${placeId}.json?auth=${fetchedToken}`,
-          { ...updatedPlaces[updatedPlaceIndex], id: null }
+          'https://ionic-booking-634af.firebaseio.com/offered-places/' +
+            `${placeId}.json?auth=${user.token}`,
+          updatedPlace
         );
       }),
-      tap(() => {
-        this._places.next(updatedPlaces);
-      })
+      mapTo(true)
     );
   }
 
-  uploadImage(image: File) {
+  uploadImage(
+    image: File
+  ): Observable<{ imageUrl: string; imagePath: string }> {
     const uploadData = new FormData();
     uploadData.append('image', image);
 
-    return this.authService.token.pipe(
+    return this.authService.user$.pipe(
       take(1),
-      switchMap(token => {
+      switchMap(user => {
         return this.http.post<{ imageUrl: string; imagePath: string }>(
           'https://us-central1-ionic-booking-634af.cloudfunctions.net/storeImage',
           uploadData,
-          { headers: { Authorization: 'Bearer ' + token } }
+          { headers: { Authorization: 'Bearer ' + user.token } }
         );
       })
     );
   }
 
+  private getUpdatedPlace(
+    placeId: string,
+    newTitle: string,
+    newDescription: string
+  ): Place {
+    const places = this.placesModel.get();
+    if (!places) {
+      throw new Error('Places is empty!');
+    }
+
+    const indexToUpdate = places.findIndex(pl => pl.id === placeId);
+    if (indexToUpdate === -1) {
+      throw new Error('Can not find a place to update!');
+    }
+
+    const outdatedPlace = places[indexToUpdate];
+    const updatedPlace = new Place(
+      null,
+      newTitle,
+      newDescription,
+      outdatedPlace.imageUrl,
+      outdatedPlace.price,
+      outdatedPlace.availableFrom,
+      outdatedPlace.availableTo,
+      outdatedPlace.userId,
+      outdatedPlace.location
+    );
+
+    return updatedPlace;
+  }
+
   private mapPlaceResourceToPlace(id: string, placeRes: PlaceResource): Place {
+    if (!placeRes) {
+      throw new Error(`Place with id: '${id}' does not exist.`);
+    }
     return new Place(
       id,
       placeRes.title,

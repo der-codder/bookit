@@ -28,7 +28,7 @@ export class AuthPage implements OnInit {
     this.isLogin = !this.isLogin;
   }
 
-  onSubmit(form: NgForm) {
+  async onSubmit(form: NgForm) {
     if (!form.valid) {
       return;
     }
@@ -36,53 +36,52 @@ export class AuthPage implements OnInit {
     const email = form.value.email;
     const password = form.value.password;
 
-    this.authenticate(email, password);
+    await this.authenticate(email, password);
     form.reset();
   }
 
-  private authenticate(email: string, password: string) {
+  private async authenticate(email: string, password: string) {
     this.isLoading = true;
-    this.loadingCtrl
-      .create({ keyboardClose: true, message: 'Logging in ...' })
-      .then(loadingEl => {
-        loadingEl.present();
-        let authObs: Observable<AuthResponseData>;
-        if (this.isLogin) {
-          authObs = this.authService.login(email, password);
-        } else {
-          authObs = this.authService.signup(email, password);
-        }
-        authObs.subscribe(
-          resData => {
-            this.isLoading = false;
-            loadingEl.dismiss();
-            this.router.navigateByUrl('/places/tabs/discover');
-          },
-          errorRes => {
-            loadingEl.dismiss();
-            const code = errorRes.error.error.message;
-            let message = 'Could not sign you up, please try again.';
-            if (code === 'EMAIL_EXISTS') {
-              message =
-                'The email address is already in use by another account.';
-            } else if (code === 'EMAIL_NOT_FOUND') {
-              message = 'E-Mail address could not be found.';
-            } else if (code === 'INVALID_PASSWORD') {
-              message = 'This password is not correct.';
-            }
-            this.showAlert(message);
-          }
-        );
-      });
+    const loadingEl = await this.loadingCtrl.create({
+      keyboardClose: true,
+      message: 'Logging in ...'
+    });
+    await loadingEl.present();
+
+    let auth$: Observable<boolean>;
+    if (this.isLogin) {
+      auth$ = this.authService.login(email, password);
+    } else {
+      auth$ = this.authService.signup(email, password);
+    }
+    auth$.subscribe(
+      async () => {
+        this.isLoading = false;
+        await loadingEl.dismiss();
+        this.router.navigateByUrl('/places/tabs/discover');
+      },
+      async errorRes => {
+        await loadingEl.dismiss();
+        await this.showAlert(errorRes.error.error.message);
+      }
+    );
   }
 
-  private showAlert(message: string) {
-    this.alertCtrl
-      .create({
-        header: 'Authentication failed',
-        message,
-        buttons: ['OK']
-      })
-      .then(alertEl => alertEl.present());
+  private async showAlert(code: string) {
+    let message = 'Could not sign you up, please try again.';
+    if (code === 'EMAIL_EXISTS') {
+      message = 'The email address is already in use by another account.';
+    } else if (code === 'EMAIL_NOT_FOUND') {
+      message = 'E-Mail address could not be found.';
+    } else if (code === 'INVALID_PASSWORD') {
+      message = 'This password is not correct.';
+    }
+
+    const alertEl = await this.alertCtrl.create({
+      header: 'Authentication failed',
+      message,
+      buttons: ['OK']
+    });
+    await alertEl.present();
   }
 }

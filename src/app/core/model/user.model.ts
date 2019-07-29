@@ -19,4 +19,11 @@ export class User {
     }
     return this._tokenExpirationDate.getTime() - new Date().getTime();
   }
+
+  static isAuthenticated(user: User): boolean {
+    if (!user) {
+      return false;
+    }
+    return !!user.token;
+  }
 }

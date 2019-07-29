@@ -6,7 +6,7 @@ import { take } from 'rxjs/operators';
 import { Platform } from '@ionic/angular';
 import { Capacitor, Plugins, AppState } from '@capacitor/core';
 
-import { AuthService } from '@app/core';
+import { AuthService, User } from '@app/core';
 
 @Component({
   selector: 'app-root',
@@ -33,14 +33,14 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.authSubscription = this.authService.userIsAuthenticated.subscribe(
-      isAuth => {
-        if (!isAuth && this.previousAuthState !== isAuth) {
-          this.router.navigateByUrl('/auth');
-        }
-        this.previousAuthState = isAuth;
+    this.authSubscription = this.authService.user$.subscribe(user => {
+      const isAuth = User.isAuthenticated(user);
+      if (!isAuth && this.previousAuthState !== isAuth) {
+        this.router.navigateByUrl('/auth');
       }
-    );
+
+      this.previousAuthState = isAuth;
+    });
     Plugins.App.addListener(
       'appStateChange',
       this.checkAuthOnResume.bind(this)

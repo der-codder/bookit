@@ -22,19 +22,21 @@ export class OffersPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.offers$ = this.placesService.places.pipe(
-      withLatestFrom(this.authService.userId),
-      map(([places, userId]) => {
+    this.offers$ = this.placesService.places$.pipe(
+      withLatestFrom(this.authService.user$),
+      map(([places, user]) => {
         if (!places) {
           return null;
         }
-        return places.filter(place => place.userId === userId);
+        return places.filter(place => place.userId === user.id);
       })
     );
   }
 
   ionViewWillEnter() {
-    this.placesService.fetchPlaces().subscribe(() => {});
+    this.placesService.fetchPlaces().subscribe(() => {
+      console.log('offersPage.fetchPlaces()');
+    });
   }
 
   async onEdit(offerId: string, slidingItem: IonItemSliding) {

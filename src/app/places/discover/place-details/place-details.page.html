@@ -9,8 +9,7 @@
 
 <ion-content>
   <ng-container *ngIf="place$ | async as placeDetails; else loadingOrError">
-    <app-place-details-view [place]="placeDetails.place"
-      [isBookable]="placeDetails.userId !== placeDetails.place.userId">
+    <app-place-details-view [place]="placeDetails.place" [isBookable]="placeDetails.isBookable">
     </app-place-details-view>
   </ng-container>
 </ion-content>

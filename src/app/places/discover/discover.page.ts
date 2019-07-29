@@ -26,19 +26,19 @@ export class DiscoverPage implements OnInit {
 
   ngOnInit() {
     this.placesViewModel$ = combineLatest([
-      this.placesService.places,
-      this.authService.userId,
+      this.placesService.places$,
+      this.authService.user$,
       this.filter$
     ]).pipe(
-      map(([places, userId, filter]) => {
-        if (!userId) {
-          throw new Error('User id is empty!');
+      map(([places, user, filter]) => {
+        if (!user || !user.id || user.id.length === 0) {
+          return { places: [], featuredPlace: null };
         }
         if (filter === 'all') {
           return this.toPlacesViewModel(places);
         } else if (filter === 'bookable') {
           const relevantPlaces = places
-            ? places.filter(place => place.userId !== userId)
+            ? places.filter(place => place.userId !== user.id)
             : null;
           return this.toPlacesViewModel(relevantPlaces);
         } else {

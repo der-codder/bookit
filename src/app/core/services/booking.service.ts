@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { take, tap, map, switchMap } from 'rxjs/operators';
+import { Model, ModelFactory } from '@angular-extensions/model';
+import { Observable, of } from 'rxjs';
+import { take, tap, map, switchMap, mapTo } from 'rxjs/operators';
 
 import { Booking } from '../model/booking.model';
 import { AuthService } from './auth.service';
@@ -18,53 +19,48 @@ interface BookingResource {
   userId: string;
 }
 
+interface BookingsResponse {
+  [key: string]: BookingResource;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class BookingService {
-  private _bookings = new BehaviorSubject<Booking[]>(null);
+  private bookingsModel: Model<Booking[]>;
+  bookings$: Observable<Booking[]>;
 
-  constructor(private authService: AuthService, private http: HttpClient) {}
-
-  get bookings(): Observable<Booking[]> {
-    return this._bookings.asObservable();
+  constructor(
+    private authService: AuthService,
+    private http: HttpClient,
+    private modelFactory: ModelFactory<Booking[]>
+  ) {
+    this.bookingsModel = this.modelFactory.create(null);
+    this.bookings$ = this.bookingsModel.data$;
   }
 
-  fetchBookings(): Observable<any[]> {
-    let fetchedUserId: string;
-    return this.authService.userId.pipe(
+  fetchBookings(): Observable<boolean> {
+    return this.authService.user$.pipe(
       tap(() => {
-        this._bookings.next(null);
+        // purge bookings to notify about loading
+        this.bookingsModel.set(null);
       }),
       take(1),
-      switchMap(userId => {
-        if (!userId) {
-          throw new Error('User id is empty');
+      switchMap(user => {
+        if (!user) {
+          // TODO: Need to return BookingsResponse
+          return of(null);
         }
-        fetchedUserId = userId;
-        return this.authService.token;
-      }),
-      take(1),
-      switchMap(token => {
-        return this.http.get<{ [key: string]: BookingResource }>(
+        return this.http.get<BookingsResponse>(
           'https://ionic-booking-634af.firebaseio.com/bookings.json' +
-            `?orderBy="userId"&equalTo="${fetchedUserId}"&auth=${token}`
+            `?orderBy="userId"&equalTo="${user.id}"&auth=${user.token}`
         );
       }),
-      map(bookingData => {
-        const bookings = [];
-        for (const key in bookingData) {
-          if (bookingData.hasOwnProperty(key)) {
-            bookings.push(
-              this.mapBookingResourceToBooking(key, bookingData[key])
-            );
-          }
-        }
-        return bookings;
+      tap(response => {
+        console.log('--fetchBookings.bookingsModel.set: ', response);
+        this.bookingsModel.set(this.convertToBookings(response));
       }),
-      tap(bookings => {
-        this._bookings.next(bookings);
-      })
+      mapTo(true)
     );
   }
 
@@ -77,25 +73,17 @@ export class BookingService {
     guestNumber: number,
     dateFrom: Date,
     dateTo: Date
-  ): Observable<Booking[]> {
-    let generatedId: string;
-    let newBooking: Booking;
-    let fetchedUserId: string;
-    return this.authService.userId.pipe(
+  ): Observable<boolean> {
+    return this.authService.user$.pipe(
       take(1),
-      switchMap(userId => {
-        if (!userId) {
-          throw new Error('User id is empty');
+      switchMap(user => {
+        if (!user) {
+          throw new Error('User is empty!');
         }
-        fetchedUserId = userId;
-        return this.authService.token;
-      }),
-      take(1),
-      switchMap(token => {
-        newBooking = new Booking(
+        const newBooking = new Booking(
           null,
           placeId,
-          fetchedUserId,
+          user.id,
           placeTitle,
           placeImage,
           firstName,
@@ -104,41 +92,61 @@ export class BookingService {
           dateFrom,
           dateTo
         );
-        return this.http.post<{ name: string }>(
-          'https://ionic-booking-634af.firebaseio.com/bookings.json?auth=' +
-            token,
-          newBooking
-        );
+        return this.http
+          .post<{ name: string }>(
+            `https://ionic-booking-634af.firebaseio.com/bookings.json?auth=${
+              user.token
+            }`,
+            newBooking
+          )
+          .pipe(
+            map(resData => {
+              newBooking.id = resData.name;
+              return newBooking;
+            })
+          );
       }),
-      switchMap(resData => {
-        generatedId = resData.name;
-        return this.bookings;
-      }),
-      take(1),
-      tap(bookings => {
-        newBooking.id = generatedId;
-        this._bookings.next(bookings.concat(newBooking));
-      })
+      mapTo(true)
     );
   }
 
-  cancelBooking(bookingId: string): Observable<Booking[]> {
-    return this.authService.token.pipe(
+  cancelBooking(bookingId: string): Observable<boolean> {
+    return this.authService.user$.pipe(
       take(1),
-      switchMap(token => {
-        return this.http
-          .delete(
-            `https://ionic-booking-634af.firebaseio.com/bookings/${bookingId}.json?auth=${token}`
-          )
-          .pipe(
-            switchMap(() => this.bookings),
-            take(1),
-            tap(bookings => {
-              this._bookings.next(bookings.filter(b => b.id !== bookingId));
-            })
-          );
-      })
+      switchMap(user => {
+        if (!user) {
+          throw new Error('User is empty!');
+        }
+        return this.http.delete(
+          'https://ionic-booking-634af.firebaseio.com/bookings/' +
+            `${bookingId}.json?auth=${user.token}`
+        );
+      }),
+      tap(() => {
+        const bookings = this.bookingsModel.get();
+        bookings.splice(bookings.findIndex(b => b.id === bookingId), 1);
+
+        console.log('--cancelBooking.bookingsModel.set: ', bookings);
+        this.bookingsModel.set(bookings);
+      }),
+      mapTo(true)
     );
+  }
+
+  private convertToBookings(bookingsResponse: BookingsResponse): Booking[] {
+    const bookings = [];
+    if (!bookingsResponse) {
+      return bookings;
+    }
+
+    for (const key in bookingsResponse) {
+      if (bookingsResponse.hasOwnProperty(key)) {
+        bookings.push(
+          this.mapBookingResourceToBooking(key, bookingsResponse[key])
+        );
+      }
+    }
+    return bookings;
   }
 
   private mapBookingResourceToBooking(

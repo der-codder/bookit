@@ -4,6 +4,7 @@ import { Observable, of } from 'rxjs';
 import { take, tap, switchMap } from 'rxjs/operators';
 
 import { AuthService } from '../services/auth.service';
+import { User } from '../model/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -15,13 +16,14 @@ export class AuthGuard implements CanLoad {
     route: Route,
     segments: UrlSegment[]
   ): Observable<boolean> | Promise<boolean> | boolean {
-    return this.authService.userIsAuthenticated.pipe(
+    return this.authService.user$.pipe(
       take(1),
-      switchMap(isAuthenticated => {
-        if (!isAuthenticated) {
+      switchMap(user => {
+        const isAuth = User.isAuthenticated(user);
+        if (!isAuth) {
           return this.authService.autoLogin();
         } else {
-          return of(isAuthenticated);
+          return of(isAuth);
         }
       }),
       tap(isAuthenticated => {

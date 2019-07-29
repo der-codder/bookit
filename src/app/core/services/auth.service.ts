@@ -1,8 +1,9 @@
-import { Injectable, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Model, ModelFactory } from '@angular-extensions/model';
 import { Plugins } from '@capacitor/core';
-import { Observable, BehaviorSubject, from } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { Observable, from } from 'rxjs';
+import { tap, mapTo, map } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
 
@@ -30,47 +31,19 @@ const AUTH_DATA_STORAGE_KEY = 'authData';
 @Injectable({
   providedIn: 'root'
 })
-export class AuthService implements OnDestroy {
-  private user = new BehaviorSubject<User>(null);
+export class AuthService {
   private activeLogoutTimer: any;
+  private userModel: Model<User>;
 
-  get userIsAuthenticated(): Observable<boolean> {
-    return this.user.asObservable().pipe(
-      map(user => {
-        if (user) {
-          return !!user.token;
-        } else {
-          return false;
-        }
-      })
-    );
+  user$: Observable<User>;
+
+  constructor(
+    private http: HttpClient,
+    private modelFactory: ModelFactory<User>
+  ) {
+    this.userModel = this.modelFactory.createMutable(null);
+    this.user$ = this.userModel.data$;
   }
-
-  get userId(): Observable<string> {
-    return this.user.asObservable().pipe(
-      map(user => {
-        if (user) {
-          return user.id;
-        } else {
-          return null;
-        }
-      })
-    );
-  }
-
-  get token(): Observable<string> {
-    return this.user.asObservable().pipe(
-      map(user => {
-        if (user) {
-          return user.token;
-        } else {
-          return null;
-        }
-      })
-    );
-  }
-
-  constructor(private http: HttpClient) {}
 
   autoLogin(): Observable<boolean> {
     return from(Plugins.Storage.get({ key: AUTH_DATA_STORAGE_KEY })).pipe(
@@ -94,17 +67,17 @@ export class AuthService implements OnDestroy {
       }),
       tap(user => {
         if (user) {
-          this.user.next(user);
+          this.userModel.set(user);
           this.autoLogout(user.tokenDuration);
         }
       }),
       map(user => {
-        return !!user;
+        return User.isAuthenticated(user);
       })
     );
   }
 
-  signup(email: string, password: string): Observable<AuthResponseData> {
+  signup(email: string, password: string): Observable<boolean> {
     return this.http
       .post<AuthResponseData>(
         `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${
@@ -112,10 +85,13 @@ export class AuthService implements OnDestroy {
         }`,
         { email, password, returnSecureToken: true }
       )
-      .pipe(tap(this.setUserData.bind(this)));
+      .pipe(
+        tap(this.setAuthData.bind(this)),
+        mapTo(true)
+      );
   }
 
-  login(email: string, password: string): Observable<AuthResponseData> {
+  login(email: string, password: string): Observable<boolean> {
     return this.http
       .post<AuthResponseData>(
         `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${
@@ -123,48 +99,36 @@ export class AuthService implements OnDestroy {
         }`,
         { email, password, returnSecureToken: true }
       )
-      .pipe(tap(userData => this.setUserData(userData)));
+      .pipe(
+        tap(userData => this.setAuthData(userData)),
+        mapTo(true)
+      );
   }
 
   logout() {
     if (this.activeLogoutTimer) {
       clearTimeout(this.activeLogoutTimer);
     }
-    this.user.next(null);
+    this.userModel.set(null);
     Plugins.Storage.remove({ key: AUTH_DATA_STORAGE_KEY });
   }
 
-  ngOnDestroy() {
-    if (this.activeLogoutTimer) {
-      clearTimeout(this.activeLogoutTimer);
-    }
-  }
-
-  private autoLogout(duration: number) {
-    if (this.activeLogoutTimer) {
-      clearTimeout(this.activeLogoutTimer);
-    }
-    this.activeLogoutTimer = setTimeout(() => {
-      this.logout();
-    }, duration);
-  }
-
-  private setUserData(userData: AuthResponseData) {
+  private setAuthData(authData: AuthResponseData) {
     const expirationDate = new Date(
-      new Date().getTime() + +userData.expiresIn * 1000
+      new Date().getTime() + +authData.expiresIn * 1000
     );
     const user = new User(
-      userData.localId,
-      userData.email,
-      userData.idToken,
+      authData.localId,
+      authData.email,
+      authData.idToken,
       expirationDate
     );
-    this.user.next(user);
+    this.userModel.set(user);
     this.autoLogout(user.tokenDuration);
     this.storeAuthData({
-      userId: userData.localId,
-      email: userData.email,
-      token: userData.idToken,
+      userId: authData.localId,
+      email: authData.email,
+      token: authData.idToken,
       tokenExpirationDate: expirationDate.toISOString()
     });
   }
@@ -174,5 +138,14 @@ export class AuthService implements OnDestroy {
       key: AUTH_DATA_STORAGE_KEY,
       value: JSON.stringify(authData)
     });
+  }
+
+  private autoLogout(duration: number) {
+    if (this.activeLogoutTimer) {
+      clearTimeout(this.activeLogoutTimer);
+    }
+    this.activeLogoutTimer = setTimeout(() => {
+      this.logout();
+    }, duration);
   }
 }
