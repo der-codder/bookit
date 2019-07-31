@@ -2,7 +2,7 @@ import { User } from './user.model';
 
 const now = new Date(2019, 7, 17);
 
-fdescribe('User', () => {
+describe('User', () => {
   beforeEach(() => {
     jasmine.clock().mockDate(now);
   });

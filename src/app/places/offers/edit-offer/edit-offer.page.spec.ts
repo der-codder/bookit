@@ -3,16 +3,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { EditOfferPage } from './edit-offer.page';
 
-describe('EditOfferPage', () => {
+xdescribe('EditOfferPage', () => {
   let component: EditOfferPage;
   let fixture: ComponentFixture<EditOfferPage>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ EditOfferPage ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    })
-    .compileComponents();
+      declarations: [EditOfferPage],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
+    }).compileComponents();
   }));
 
   beforeEach(() => {
