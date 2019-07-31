@@ -7,3 +7,4 @@ export * from './model/user.model';
 export * from './services/auth.service';
 export * from './services/booking.service';
 export * from './services/places.service';
+export * from './services/settings.service';

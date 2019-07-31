@@ -9,7 +9,7 @@ import {
 import { map, switchMap } from 'rxjs/operators';
 import { of } from 'rxjs';
 
-import { PlaceLocation } from '@app/core';
+import { PlaceLocation, SettingsService } from '@app/core';
 
 import { MapModalComponent } from '../map-modal/map-modal.component';
 import { environment } from '../../../../environments/environment';
@@ -20,6 +20,8 @@ import { environment } from '../../../../environments/environment';
   styleUrls: ['./location-picker.component.scss']
 })
 export class LocationPickerComponent implements OnInit {
+  private _googleMapsAPIKey: string;
+
   @Output() locationPick = new EventEmitter<PlaceLocation>();
   @Input() showPreview = false;
 
@@ -27,13 +29,16 @@ export class LocationPickerComponent implements OnInit {
   isLoadingLocationImage = false;
 
   constructor(
-    private modalCtrl: ModalController,
     private http: HttpClient,
+    private settingsService: SettingsService,
     private actionSheetCtrl: ActionSheetController,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private modalCtrl: ModalController
   ) {}
 
-  ngOnInit() {}
+  async ngOnInit() {
+    this._googleMapsAPIKey = await this.settingsService.getGoogleMapsAPIKey();
+  }
 
   onPickLocation() {
     this.actionSheetCtrl
@@ -133,7 +138,7 @@ export class LocationPickerComponent implements OnInit {
     return this.http
       .get<{ results: any[] }>(
         'https://maps.googleapis.com/maps/api/geocode/json?' +
-          `latlng=${lat},${lng}&key=${environment.googleMapsAPIKey}`
+          `latlng=${lat},${lng}&key=${this._googleMapsAPIKey}`
       )
       .pipe(
         map(geoData => {
@@ -150,7 +155,7 @@ export class LocationPickerComponent implements OnInit {
       'https://maps.googleapis.com/maps/api/staticmap?' +
       `center=${lat},${lng}&zoom=${zoom}&size=500x300&maptype=roadmap` +
       `&markers=color:red%7Place:S%7C${lat},${lng}` +
-      `&key=${environment.googleMapsAPIKey}`
+      `&key=${this._googleMapsAPIKey}`
     );
   }
 }

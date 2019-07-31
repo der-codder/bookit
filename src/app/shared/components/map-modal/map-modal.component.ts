@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 
-import { environment } from '@env/environment';
+import { SettingsService } from '@app/core';
 
 @Component({
   selector: 'app-map-modal',
@@ -28,11 +28,12 @@ export class MapModalComponent implements OnInit, AfterViewInit, OnDestroy {
   private clickListener: any;
 
   constructor(
+    private settingsService: SettingsService,
     private modalCtrl: ModalController,
     private renderer: Renderer2
   ) {}
 
-  ngOnInit() {}
+  async ngOnInit() {}
 
   ngAfterViewInit() {
     this.getGoogleMaps()
@@ -63,11 +64,11 @@ export class MapModalComponent implements OnInit, AfterViewInit, OnDestroy {
       return Promise.resolve(googleModule.maps);
     }
 
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${
-        environment.googleMapsAPIKey
-      }`;
+      const googleMapsAPIKey = await this.settingsService.getGoogleMapsAPIKey();
+
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}`;
       script.async = true;
       script.defer = true;
       document.body.appendChild(script);
