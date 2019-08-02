@@ -14,6 +14,7 @@ import { Place } from '@app/core';
 })
 export class PlacesListComponent implements OnInit {
   @Input() places: Place[];
+  @Input() pathToDefaults: string;
 
   constructor() {}
 

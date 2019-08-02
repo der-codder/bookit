@@ -8,6 +8,7 @@ import { Place } from '@app/core';
 })
 export class FeaturedPlaceComponent implements OnInit {
   @Input() place: Place;
+  @Input() pathToDefaults: string;
 
   constructor() {}
 

@@ -1,0 +1,11 @@
+<ion-list>
+  <ion-item detail *ngFor="let place of places" [routerLink]="[pathToDefaults, place.id]">
+    <ion-thumbnail slot="start">
+      <ion-img [src]="place.imageUrl"></ion-img>
+    </ion-thumbnail>
+    <ion-label>
+      <h2>{{ place.title }}</h2>
+      <p>{{ place.description }}</p>
+    </ion-label>
+  </ion-item>
+</ion-list>

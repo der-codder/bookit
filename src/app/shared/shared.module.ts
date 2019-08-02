@@ -8,13 +8,17 @@ import { CreateBookingComponent } from './components/create-booking/create-booki
 import { LocationPickerComponent } from './components/location-picker/location-picker.component';
 import { MapModalComponent } from './components/map-modal/map-modal.component';
 import { ImagePickerComponent } from './components/image-picker/image-picker.component';
+import { FeaturedPlaceComponent } from './components/featured-place/featured-place.component';
+import { RouterModule } from '@angular/router';
+import { PlacesListComponent } from './components/places-list/places-list.component';
 
 @NgModule({
-  declarations: [
-    CreateBookingComponent,
-    LocationPickerComponent,
-    MapModalComponent,
-    ImagePickerComponent
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    RouterModule,
+    IonicModule
   ],
   exports: [
     CommonModule,
@@ -24,8 +28,17 @@ import { ImagePickerComponent } from './components/image-picker/image-picker.com
     CreateBookingComponent,
     LocationPickerComponent,
     MapModalComponent,
-    ImagePickerComponent
+    ImagePickerComponent,
+    FeaturedPlaceComponent,
+    PlacesListComponent
   ],
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, IonicModule]
+  declarations: [
+    CreateBookingComponent,
+    LocationPickerComponent,
+    MapModalComponent,
+    ImagePickerComponent,
+    FeaturedPlaceComponent,
+    PlacesListComponent
+  ]
 })
 export class SharedModule {}

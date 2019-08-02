@@ -10,7 +10,7 @@
     <p>{{ place.description }}</p>
   </ion-card-content>
   <div text-right>
-    <ion-button fill="clear" color="primary" [routerLink]="['/', 'places', 'tabs', 'discover', place.id]">
+    <ion-button fill="clear" color="primary" [routerLink]="[pathToDefaults, place.id]">
       More
     </ion-button>
   </div>
