@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { PlacesPage } from './places.page';
+import { AuthGuard } from '@app/core';
 
 const routes: Routes = [
   {
@@ -33,21 +34,24 @@ const routes: Routes = [
           {
             path: '',
             loadChildren: () =>
-              import('./offers/offers.module').then(m => m.OffersPageModule)
+              import('./offers/offers.module').then(m => m.OffersPageModule),
+            canLoad: [AuthGuard]
           },
           {
             path: 'new',
             loadChildren: () =>
               import('./offers/new-offer/new-offer.module').then(
                 m => m.NewOfferPageModule
-              )
+              ),
+            canLoad: [AuthGuard]
           },
           {
             path: 'edit/:placeId',
             loadChildren: () =>
               import('./offers/edit-offer/edit-offer.module').then(
                 m => m.EditOfferPageModule
-              )
+              ),
+            canLoad: [AuthGuard]
           }
         ]
       },

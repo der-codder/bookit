@@ -12,8 +12,7 @@ const routes: Routes = [
   {
     path: 'places',
     loadChildren: () =>
-      import('./places/places.module').then(m => m.PlacesPageModule),
-    canLoad: [AuthGuard]
+      import('./places/places.module').then(m => m.PlacesPageModule)
   },
   {
     path: 'bookings',

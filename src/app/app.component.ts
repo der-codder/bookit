@@ -17,8 +17,8 @@ export class AppComponent implements OnInit, OnDestroy {
   private authSubscription: Subscription;
 
   constructor(
+    public authService: AuthService,
     private platform: Platform,
-    private authService: AuthService,
     private router: Router
   ) {
     this.initializeApp();
@@ -33,16 +33,17 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.authSubscription = this.authService.isAuthenticated.subscribe(
-      isAuth => {
-        if (!isAuth && this.previousAuthState !== isAuth) {
-          this.router.navigateByUrl('/auth');
-        }
+    // this.authSubscription = this.authService.isAuthenticated.subscribe(
+    //   isAuth => {
+    //     if (!isAuth && this.previousAuthState !== isAuth) {
+    //       this.router.navigateByUrl('/auth');
+    //     }
 
-        this.previousAuthState = isAuth;
-      }
-    );
+    //     this.previousAuthState = isAuth;
+    //   }
+    // );
 
+    console.log('test');
     Plugins.App.addListener(
       'appStateChange',
       this.checkAuthOnResume.bind(this)
