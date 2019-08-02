@@ -16,14 +16,13 @@ export class AuthGuard implements CanLoad {
     route: Route,
     segments: UrlSegment[]
   ): Observable<boolean> | Promise<boolean> | boolean {
-    return this.authService.user$.pipe(
+    return this.authService.isAuthenticated.pipe(
       take(1),
-      switchMap(user => {
-        const isAuth = User.isAuthenticated(user);
-        if (!isAuth) {
+      switchMap(isAuthenticated => {
+        if (!isAuthenticated) {
           return this.authService.autoLogin();
         } else {
-          return of(isAuth);
+          return of(isAuthenticated);
         }
       }),
       tap(isAuthenticated => {

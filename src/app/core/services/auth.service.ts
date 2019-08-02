@@ -2,8 +2,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Model, ModelFactory } from '@angular-extensions/model';
 import { Plugins } from '@capacitor/core';
-import { Observable, from } from 'rxjs';
-import { tap, mapTo, map } from 'rxjs/operators';
+import { Observable, from, of } from 'rxjs';
+import { tap, mapTo, map, take, switchMap } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
 
@@ -36,6 +36,16 @@ export class AuthService {
   private userModel: Model<User>;
 
   user$: Observable<User>;
+
+  get isAuthenticated(): Observable<boolean> {
+    return this.user$.pipe(
+      take(1),
+      switchMap(user => {
+        const isAuth = this.isUserAuthenticated(user);
+        return of(isAuth);
+      })
+    );
+  }
 
   constructor(
     private http: HttpClient,
@@ -72,7 +82,7 @@ export class AuthService {
         }
       }),
       map(user => {
-        return User.isAuthenticated(user);
+        return this.isUserAuthenticated(user);
       })
     );
   }
@@ -111,6 +121,13 @@ export class AuthService {
     }
     this.userModel.set(null);
     Plugins.Storage.remove({ key: AUTH_DATA_STORAGE_KEY });
+  }
+
+  private isUserAuthenticated(user: User): boolean {
+    if (!user) {
+      return false;
+    }
+    return !!user.token;
   }
 
   private setAuthData(authData: AuthResponseData) {
