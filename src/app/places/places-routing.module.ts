@@ -17,14 +17,16 @@ const routes: Routes = [
             loadChildren: () =>
               import('./discover/discover.module').then(
                 m => m.DiscoverPageModule
-              )
+              ),
+            canLoad: [AuthGuard]
           },
           {
             path: ':placeId',
             loadChildren: () =>
-              import('./discover/place-details/place-details.module').then(
+              import('./place-details/place-details.module').then(
                 m => m.PlaceDetailsPageModule
-              )
+              ),
+            canLoad: [AuthGuard]
           }
         ]
       },
