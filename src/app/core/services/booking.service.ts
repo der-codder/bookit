@@ -57,7 +57,6 @@ export class BookingService {
         );
       }),
       tap(response => {
-        console.log('--fetchBookings.bookingsModel.set: ', response);
         this.bookingsModel.set(this.convertToBookings(response));
       }),
       mapTo(true)
@@ -126,7 +125,6 @@ export class BookingService {
         const bookings = this.bookingsModel.get();
         bookings.splice(bookings.findIndex(b => b.id === bookingId), 1);
 
-        console.log('--cancelBooking.bookingsModel.set: ', bookings);
         this.bookingsModel.set(bookings);
       }),
       mapTo(true)
