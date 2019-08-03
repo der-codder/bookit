@@ -6,6 +6,10 @@ export class User {
     private _tokenExpirationDate: Date
   ) {}
 
+  get isAuthenticated(): boolean {
+    return !!this.token;
+  }
+
   get token(): string {
     if (!this._tokenExpirationDate || this._tokenExpirationDate <= new Date()) {
       return null;

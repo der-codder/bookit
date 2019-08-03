@@ -41,7 +41,7 @@ export class AuthService {
     return this.user$.pipe(
       take(1),
       switchMap(user => {
-        const isAuth = this.isUserAuthenticated(user);
+        const isAuth = user ? user.isAuthenticated : false;
         return of(isAuth);
       })
     );
@@ -77,12 +77,13 @@ export class AuthService {
       }),
       tap(user => {
         if (user) {
+          console.log('autoLogin()', user);
           this.userModel.set(user);
           this.autoLogout(user.tokenDuration);
         }
       }),
       map(user => {
-        return this.isUserAuthenticated(user);
+        return user ? user.isAuthenticated : false;
       })
     );
   }
@@ -121,13 +122,6 @@ export class AuthService {
     }
     this.userModel.set(null);
     Plugins.Storage.remove({ key: AUTH_DATA_STORAGE_KEY });
-  }
-
-  private isUserAuthenticated(user: User): boolean {
-    if (!user) {
-      return false;
-    }
-    return !!user.token;
   }
 
   private setAuthData(authData: AuthResponseData) {

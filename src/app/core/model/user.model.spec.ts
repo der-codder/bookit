@@ -66,4 +66,51 @@ describe('User', () => {
       expect(user.tokenDuration).toEqual(0);
     });
   });
+
+  describe('get isAuthenticated(): boolean', () => {
+    it('should return true if user has not expired token', () => {
+      const expectedToken = 'token_test';
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const user = new User(null, null, expectedToken, tomorrow);
+
+      const actual = user.isAuthenticated;
+
+      expect(actual).toBeTruthy();
+    });
+
+    it('should return false if user has expired token', () => {
+      const expectedToken = 'token_test';
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      const user = new User(null, null, expectedToken, yesterday);
+
+      const actual = user.isAuthenticated;
+
+      expect(actual).toBeFalsy();
+    });
+
+    it('should return false if user has no token', () => {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const user = new User(null, null, null, tomorrow);
+
+      const actual = user.isAuthenticated;
+
+      expect(actual).toBeFalsy();
+    });
+
+    it('should return false if user token is empty string', () => {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const user = new User(null, null, '', tomorrow);
+
+      const actual = user.isAuthenticated;
+
+      expect(actual).toBeFalsy();
+    });
+  });
 });
