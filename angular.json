@@ -1,5 +1,5 @@
 {
-  "$schema": "./node_modules/@angular-devkit/core/src/workspace/workspace-schema.json",
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
   "defaultProject": "app",
   "newProjectRoot": "projects",
@@ -9,7 +9,13 @@
       "sourceRoot": "src",
       "projectType": "application",
       "prefix": "app",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+          "changeDetection": "OnPush",
+          "inlineStyle": true,
+          "styleext": "scss"
+        }
+      },
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
@@ -19,8 +25,7 @@
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.app.json",
-            "assets": [
-              {
+            "assets": [{
                 "glob": "**/*",
                 "input": "src/assets",
                 "output": "assets"
@@ -32,8 +37,7 @@
               },
               "src/manifest.json"
             ],
-            "styles": [
-              {
+            "styles": [{
                 "input": "src/theme/variables.scss"
               },
               {
@@ -48,12 +52,10 @@
           },
           "configurations": {
             "production": {
-              "fileReplacements": [
-                {
-                  "replace": "src/environments/environment.ts",
-                  "with": "src/environments/environment.prod.ts"
-                }
-              ],
+              "fileReplacements": [{
+                "replace": "src/environments/environment.ts",
+                "with": "src/environments/environment.prod.ts"
+              }],
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
@@ -63,13 +65,11 @@
               "extractLicenses": true,
               "vendorChunk": false,
               "buildOptimizer": true,
-              "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "2mb",
-                  "maximumError": "5mb"
-                }
-              ],
+              "budgets": [{
+                "type": "initial",
+                "maximumWarning": "2mb",
+                "maximumError": "5mb"
+              }],
               "serviceWorker": true,
               "ngswConfigPath": "src/ngsw-config.json"
             },
@@ -107,8 +107,7 @@
             "karmaConfig": "src/karma.conf.js",
             "styles": [],
             "scripts": [],
-            "assets": [
-              {
+            "assets": [{
                 "glob": "favicon.ico",
                 "input": "src/",
                 "output": "/"
