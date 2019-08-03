@@ -1,7 +1,9 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/places/tabs/discover"></ion-back-button>
+      <ion-back-button defaultHref="/places/tabs/discover"
+        *ngIf="authService.isAuthenticated | async; else unauthorized">
+      </ion-back-button>
     </ion-buttons>
     <ion-title>{{ (place$ | async)?.place.title || 'Loading...' }}</ion-title>
   </ion-toolbar>
@@ -23,4 +25,9 @@
       <ion-spinner color="primary"></ion-spinner>
     </div>
   </ng-template>
+</ng-template>
+
+<ng-template #unauthorized>
+  <ion-back-button defaultHref="/places">
+  </ion-back-button>
 </ng-template>

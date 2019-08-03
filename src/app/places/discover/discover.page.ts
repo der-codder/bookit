@@ -48,6 +48,14 @@ export class DiscoverPage implements OnInit {
     );
   }
 
+  ionViewWillEnter() {
+    this.placesService.fetchPlaces().subscribe(() => {});
+  }
+
+  onFilterUpdate(newFilterValue: 'all' | 'bookable') {
+    this.filter$.next(newFilterValue);
+  }
+
   private toPlacesViewModel(places: Place[]): PlacesViewModel {
     if (!places) {
       return null;
@@ -57,13 +65,5 @@ export class DiscoverPage implements OnInit {
       const featuredPlace = places[0];
       return { places: places.slice(1), featuredPlace };
     }
-  }
-
-  ionViewWillEnter() {
-    this.placesService.fetchPlaces().subscribe(() => {});
-  }
-
-  onFilterUpdate(newFilterValue: 'all' | 'bookable') {
-    this.filter$.next(newFilterValue);
   }
 }

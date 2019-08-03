@@ -1,12 +1,47 @@
-<ion-tabs>
-  <ion-tab-bar slot="bottom">
-    <ion-tab-button tab="discover">
-      <ion-label>Discover</ion-label>
-      <ion-icon name="search"></ion-icon>
-    </ion-tab-button>
-    <ion-tab-button tab="offers">
-      <ion-label>My Offers</ion-label>
-      <ion-icon name="card"></ion-icon>
-    </ion-tab-button>
-  </ion-tab-bar>
-</ion-tabs>
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Discover Places</ion-title>
+    <ion-buttons slot="primary">
+      <ion-button [routerLink]="['/auth']">
+        Login
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-grid *ngIf="placesViewModel$ | async as placesViewModel; else loading">
+    <ng-container *ngIf="placesViewModel.places.length > 0 || placesViewModel.featuredPlace; else noPlaces">
+      <ion-row>
+        <ion-col size="12" size-sm="8" offset-sm="2" text-center>
+          <app-featured-place [place]="placesViewModel.featuredPlace">
+          </app-featured-place>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col size="12" size-sm="8" offset-sm="2" text-center>
+          <app-places-list [places]="placesViewModel.places">
+          </app-places-list>
+        </ion-col>
+      </ion-row>
+    </ng-container>
+  </ion-grid>
+</ion-content>
+
+<ng-template #loading>
+  <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-sm="8" offset-sm="2" text-center>
+        <ion-spinner color="primary"></ion-spinner>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ng-template>
+
+<ng-template #noPlaces>
+  <ion-row>
+    <ion-col size="12" size-sm="8" offset-sm="2" text-center>
+      <p>There are no bookable places right now.<br>Please come back later!</p>
+    </ion-col>
+  </ion-row>
+</ng-template>

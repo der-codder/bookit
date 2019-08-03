@@ -36,48 +36,33 @@ export class PlacesService {
   }
 
   fetchPlaces(): Observable<boolean> {
-    return this.authService.user$.pipe(
-      tap(() => {
-        // purge places to notify about loading
-        this.placesModel.set(null);
-      }),
-      take(1),
-      switchMap(user => {
-        return this.http.get<{ [key: string]: PlaceResource }>(
-          `https://ionic-booking-634af.firebaseio.com/offered-places.json?auth=${
-            user.token
-          }`
-        );
-      }),
-      map(resData => {
-        const places = [];
-        for (const key in resData) {
-          if (resData.hasOwnProperty(key)) {
-            places.push(this.mapPlaceResourceToPlace(key, resData[key]));
+    return this.http
+      .get('https://ionic-booking-634af.firebaseio.com/offered-places.json')
+      .pipe(
+        map(resData => {
+          const places = [];
+          for (const key in resData) {
+            if (resData.hasOwnProperty(key)) {
+              places.push(this.mapPlaceResourceToPlace(key, resData[key]));
+            }
           }
-        }
-        return places;
-      }),
-      tap(places => {
-        console.log('-- fetchPlaces.set(places)');
-        this.placesModel.set(places);
-      }),
-      mapTo(true)
-    );
+          return places;
+        }),
+        tap(places => {
+          this.placesModel.set(places);
+        }),
+        mapTo(true)
+      );
   }
 
   getPlace(id: string): Observable<Place> {
-    return this.authService.user$.pipe(
-      take(1),
-      switchMap(user => {
-        return this.http.get<PlaceResource>(
-          `https://ionic-booking-634af.firebaseio.com/offered-places/${id}.json?auth=${
-            user.token
-          }`
-        );
-      }),
-      map(placeResource => this.mapPlaceResourceToPlace(id, placeResource))
-    );
+    return this.http
+      .get<PlaceResource>(
+        `https://ionic-booking-634af.firebaseio.com/offered-places/${id}.json`
+      )
+      .pipe(
+        map(placeResource => this.mapPlaceResourceToPlace(id, placeResource))
+      );
   }
 
   addPlace(

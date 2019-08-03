@@ -22,8 +22,8 @@ export class PlaceDetailsPage implements OnInit {
   loadingError$ = new Subject<boolean>();
 
   constructor(
+    public authService: AuthService,
     private route: ActivatedRoute,
-    private authService: AuthService,
     private placesService: PlacesService,
     private navCtrl: NavController
   ) {}
@@ -38,12 +38,10 @@ export class PlaceDetailsPage implements OnInit {
       this.place$ = this.authService.user$.pipe(
         take(1),
         switchMap(user => {
-          if (!user) {
-            throw new Error('User is empty!');
-          }
           return this.placesService.getPlace(paramMap.get('placeId')).pipe(
             map(place => {
-              return { place, isBookable: place.userId !== user.id };
+              const isBookable = user ? place.userId !== user.id : false;
+              return { place, isBookable };
             })
           );
         }),

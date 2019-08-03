@@ -5,7 +5,7 @@ import {
   ChangeDetectionStrategy
 } from '@angular/core';
 
-import { Place } from '@app/core';
+import { Place, AuthService } from '@app/core';
 
 @Component({
   selector: 'app-places-list',
@@ -14,9 +14,8 @@ import { Place } from '@app/core';
 })
 export class PlacesListComponent implements OnInit {
   @Input() places: Place[];
-  @Input() pathToDefaults: string;
 
-  constructor() {}
+  constructor(public authService: AuthService) {}
 
   ngOnInit() {}
 }

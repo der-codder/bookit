@@ -10,8 +10,15 @@
     <p>{{ place.description }}</p>
   </ion-card-content>
   <div text-right>
-    <ion-button fill="clear" color="primary" [routerLink]="[pathToDefaults, place.id]">
+    <ion-button fill="clear" color="primary" [routerLink]="['/places/tabs/discover', place.id]"
+      *ngIf="authService.isAuthenticated | async; else unauthorized">
       More
     </ion-button>
   </div>
 </ion-card>
+
+<ng-template #unauthorized>
+  <ion-button fill="clear" color="primary" [routerLink]="['/places', place.id]">
+    More
+  </ion-button>
+</ng-template>

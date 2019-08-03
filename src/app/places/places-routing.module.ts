@@ -3,11 +3,12 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { PlacesPage } from './places.page';
 import { AuthGuard } from '@app/core';
+import { TabbedPlacesPage } from './tabbed-places.page';
 
 const routes: Routes = [
   {
     path: 'tabs',
-    component: PlacesPage,
+    component: TabbedPlacesPage,
     children: [
       {
         path: 'discover',
@@ -65,8 +66,15 @@ const routes: Routes = [
     ]
   },
   {
+    path: ':placeId',
+    loadChildren: () =>
+      import('./place-details/place-details.module').then(
+        m => m.PlaceDetailsPageModule
+      )
+  },
+  {
     path: '',
-    redirectTo: '/places/tabs/discover'
+    component: PlacesPage
   }
 ];
 
