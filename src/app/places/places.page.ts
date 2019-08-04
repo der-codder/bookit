@@ -20,8 +20,8 @@ export class PlacesPage implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router,
-    public placesService: PlacesService
+    private placesService: PlacesService,
+    private router: Router
   ) {}
 
   ngOnInit() {
