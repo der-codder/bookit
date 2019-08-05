@@ -1,3 +1,4 @@
+import { ReverseAuthGuard } from './core/guards/reverse-auth.guard';
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
@@ -7,7 +8,9 @@ const routes: Routes = [
   { path: '', redirectTo: 'places', pathMatch: 'full' },
   {
     path: 'auth',
-    loadChildren: () => import('./auth/auth.module').then(m => m.AuthPageModule)
+    loadChildren: () =>
+      import('./auth/auth.module').then(m => m.AuthPageModule),
+    canLoad: [ReverseAuthGuard]
   },
   {
     path: 'places',

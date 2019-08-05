@@ -1,9 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { Place, AuthService, PlacesService } from '@app/core';
+import { Place, PlacesService } from '@app/core';
 
 interface PlacesViewModel {
   places: Place[];
@@ -18,18 +17,9 @@ interface PlacesViewModel {
 export class PlacesPage implements OnInit {
   placesViewModel$: Observable<PlacesViewModel>;
 
-  constructor(
-    private authService: AuthService,
-    private placesService: PlacesService,
-    private router: Router
-  ) {}
+  constructor(private placesService: PlacesService) {}
 
   ngOnInit() {
-    this.authService.isAuthenticated.subscribe(isAuth => {
-      if (isAuth) {
-        this.router.navigateByUrl('/places/tabs/discover');
-      }
-    });
     this.placesViewModel$ = this.placesService.places$.pipe(
       map(places => this.toPlacesViewModel(places))
     );

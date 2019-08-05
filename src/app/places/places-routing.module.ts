@@ -1,8 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { AuthGuard, ReverseAuthGuard } from '@app/core';
+
 import { PlacesPage } from './places.page';
-import { AuthGuard } from '@app/core';
 import { TabbedPlacesPage } from './tabbed-places.page';
 
 const routes: Routes = [
@@ -74,7 +75,8 @@ const routes: Routes = [
   },
   {
     path: '',
-    component: PlacesPage
+    component: PlacesPage,
+    canActivate: [ReverseAuthGuard]
   }
 ];
 

@@ -1,5 +1,6 @@
 export * from './core.module';
 export * from './guards/auth.guard';
+export * from './guards/reverse-auth.guard';
 export * from './model/booking.model';
 export * from './model/location.model';
 export * from './model/place.model';

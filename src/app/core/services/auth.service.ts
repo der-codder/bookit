@@ -77,7 +77,6 @@ export class AuthService {
       }),
       tap(user => {
         if (user) {
-          console.log('autoLogin()', user);
           this.userModel.set(user);
           this.autoLogout(user.tokenDuration);
         }
@@ -134,6 +133,7 @@ export class AuthService {
       authData.idToken,
       expirationDate
     );
+
     this.userModel.set(user);
     this.autoLogout(user.tokenDuration);
     this.storeAuthData({
@@ -156,6 +156,7 @@ export class AuthService {
       clearTimeout(this.activeLogoutTimer);
     }
     this.activeLogoutTimer = setTimeout(() => {
+      console.log('---- autoLogout');
       this.logout();
     }, duration);
   }
