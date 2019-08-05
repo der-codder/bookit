@@ -21,14 +21,6 @@ const routes: Routes = [
                 m => m.DiscoverPageModule
               ),
             canLoad: [AuthGuard]
-          },
-          {
-            path: ':placeId',
-            loadChildren: () =>
-              import('./place-details/place-details.module').then(
-                m => m.PlaceDetailsPageModule
-              ),
-            canLoad: [AuthGuard]
           }
         ]
       },

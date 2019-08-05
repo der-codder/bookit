@@ -1,6 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 
-import { Place, AuthService } from '@app/core';
+import { Place } from '@app/core';
 
 @Component({
   selector: 'app-featured-place',
@@ -9,7 +9,7 @@ import { Place, AuthService } from '@app/core';
 export class FeaturedPlaceComponent implements OnInit {
   @Input() place: Place;
 
-  constructor(public authService: AuthService) {}
+  constructor() {}
 
   ngOnInit() {}
 }
