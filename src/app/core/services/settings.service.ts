@@ -2,7 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { AuthService } from './auth.service';
-import { take, switchMap, map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -12,26 +13,18 @@ export class SettingsService {
 
   constructor(private authService: AuthService, private http: HttpClient) {}
 
-  async getGoogleMapsAPIKey(): Promise<string> {
+  getGoogleMapsAPIKey(): Observable<string> {
     if (this._googleMapsAPIKey) {
-      return this._googleMapsAPIKey;
+      return of(this._googleMapsAPIKey);
     }
 
-    this._googleMapsAPIKey = await this.authService.user$
-      .pipe(
-        take(1),
-        switchMap(user => {
-          const res = this.http.get<{ googleMapsAPIKey: string }>(
-            `https://ionic-booking-634af.firebaseio.com/settings.json?auth=${
-              user.token
-            }`
-          );
-          return res;
-        }),
-        map(response => response.googleMapsAPIKey)
+    return this.http
+      .get<{ googleMapsAPIKey: string }>(
+        'https://ionic-booking-634af.firebaseio.com/settings.json'
       )
-      .toPromise();
-
-    return this._googleMapsAPIKey;
+      .pipe(
+        map(response => response.googleMapsAPIKey),
+        tap(googleMapsAPIKey => (this._googleMapsAPIKey = googleMapsAPIKey))
+      );
   }
 }
