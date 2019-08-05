@@ -18,13 +18,15 @@ describe('AuthService', () => {
     expect(service).toBeTruthy();
   });
 
-  describe('isAuthenticated(): Observable<boolean>', () => {
+  describe('get isAuthenticated$(): Observable<boolean>', () => {
     describe('should return false', () => {
       it('if user is empty', () => {
         const service: AuthService = TestBed.get(AuthService);
         service.user$ = of(null);
 
-        service.isAuthenticated.subscribe(result => expect(result).toBeFalsy());
+        service.isAuthenticated$.subscribe(result =>
+          expect(result).toBeFalsy()
+        );
       });
 
       it('if user has expired token', () => {
@@ -32,7 +34,9 @@ describe('AuthService', () => {
         const user: any = { token: null };
         service.user$ = of(user);
 
-        service.isAuthenticated.subscribe(result => expect(result).toBeFalsy());
+        service.isAuthenticated$.subscribe(result =>
+          expect(result).toBeFalsy()
+        );
       });
     });
 
@@ -44,7 +48,7 @@ describe('AuthService', () => {
       );
       service.user$ = of(user);
 
-      service.isAuthenticated.subscribe(result => expect(result).toBeTruthy());
+      service.isAuthenticated$.subscribe(result => expect(result).toBeTruthy());
       expect(spy).toHaveBeenCalled();
     });
   });

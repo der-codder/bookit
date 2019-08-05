@@ -37,14 +37,8 @@ export class AuthService {
 
   user$: Observable<User>;
 
-  get isAuthenticated(): Observable<boolean> {
-    return this.user$.pipe(
-      take(1),
-      switchMap(user => {
-        const isAuth = user ? user.isAuthenticated : false;
-        return of(isAuth);
-      })
-    );
+  get isAuthenticated$(): Observable<boolean> {
+    return this.user$.pipe(map(user => (user ? user.isAuthenticated : false)));
   }
 
   constructor(
@@ -156,7 +150,6 @@ export class AuthService {
       clearTimeout(this.activeLogoutTimer);
     }
     this.activeLogoutTimer = setTimeout(() => {
-      console.log('---- autoLogout');
       this.logout();
     }, duration);
   }

@@ -30,7 +30,7 @@ export class ReverseAuthGuard implements CanActivate, CanLoad {
   }
 
   private isAllowed(): Observable<boolean> {
-    return this.authService.isAuthenticated.pipe(
+    return this.authService.isAuthenticated$.pipe(
       take(1),
       switchMap(isAuth => {
         if (!isAuth) {

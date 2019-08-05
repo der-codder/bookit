@@ -1,6 +1,4 @@
-import { TestBed, async, inject } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { RouterTestingModule } from '@angular/router/testing';
+import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { Observable, of } from 'rxjs';
 
@@ -8,7 +6,7 @@ import { ReverseAuthGuard } from './reverse-auth.guard';
 import { AuthService } from '../services/auth.service';
 
 class MockAuthService {
-  isAuthenticated: Observable<boolean>;
+  isAuthenticated$: Observable<boolean>;
 
   autoLogin(): Observable<boolean> {
     return null;
@@ -54,7 +52,7 @@ describe('ReverseAuthGuard', () => {
   describe('canActivate(next: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean>', () => {
     describe('should return true', () => {
       it('if user is not authenticated and autoLogin is not successful', () => {
-        authService.isAuthenticated = of(false);
+        authService.isAuthenticated$ = of(false);
         spyOn(authService, 'autoLogin').and.returnValue(of(false));
 
         reverseAuthGuard.canActivate(null, null).subscribe(result => {
@@ -66,7 +64,7 @@ describe('ReverseAuthGuard', () => {
 
     describe('if user is authenticated', () => {
       it('should return false', () => {
-        authService.isAuthenticated = of(true);
+        authService.isAuthenticated$ = of(true);
 
         reverseAuthGuard.canActivate(null, null).subscribe(result => {
           expect(result).toBeFalsy();
@@ -74,7 +72,7 @@ describe('ReverseAuthGuard', () => {
       });
 
       it('should navigate to "/places/tabs/discover"', () => {
-        authService.isAuthenticated = of(true);
+        authService.isAuthenticated$ = of(true);
         spyOn(router, 'navigateByUrl').and.returnValue(of(false));
 
         reverseAuthGuard.canActivate(null, null).subscribe(result => {
@@ -90,7 +88,7 @@ describe('ReverseAuthGuard', () => {
   describe('canLoad(route: Route, segments: UrlSegment[]): Observable<boolean>', () => {
     describe('should return true', () => {
       it('if user is not authenticated and autoLogin is not successful', () => {
-        authService.isAuthenticated = of(false);
+        authService.isAuthenticated$ = of(false);
         spyOn(authService, 'autoLogin').and.returnValue(of(false));
 
         reverseAuthGuard.canLoad(null, null).subscribe(result => {
@@ -102,7 +100,7 @@ describe('ReverseAuthGuard', () => {
 
     describe('if user is authenticated', () => {
       it('should return false', () => {
-        authService.isAuthenticated = of(true);
+        authService.isAuthenticated$ = of(true);
 
         reverseAuthGuard.canLoad(null, null).subscribe(result => {
           expect(result).toBeFalsy();
@@ -110,7 +108,7 @@ describe('ReverseAuthGuard', () => {
       });
 
       it('should navigate to "/places/tabs/discover"', () => {
-        authService.isAuthenticated = of(true);
+        authService.isAuthenticated$ = of(true);
         spyOn(router, 'navigateByUrl').and.returnValue(of(false));
 
         reverseAuthGuard.canLoad(null, null).subscribe(result => {

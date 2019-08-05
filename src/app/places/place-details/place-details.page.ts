@@ -1,10 +1,10 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NavController } from '@ionic/angular';
-import { Observable, Subject, of } from 'rxjs';
-import { take, switchMap, catchError, map } from 'rxjs/operators';
+import { Observable, Subject, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-import { Place, AuthService, PlacesService } from '@app/core';
+import { Place, AuthService, PlacesService, SettingsService } from '@app/core';
 
 interface PlaceViewModel {
   place: Place;
@@ -23,6 +23,7 @@ export class PlaceDetailsPage implements OnInit {
 
   constructor(
     public authService: AuthService,
+    private settingsService: SettingsService,
     private route: ActivatedRoute,
     private placesService: PlacesService,
     private navCtrl: NavController
@@ -35,20 +36,18 @@ export class PlaceDetailsPage implements OnInit {
         return;
       }
 
-      this.place$ = this.authService.user$.pipe(
-        take(1),
-        switchMap(user => {
-          return this.placesService.getPlace(paramMap.get('placeId')).pipe(
-            map(place => {
-              const isBookable = user ? place.userId !== user.id : false;
-              return { place, isBookable };
-            })
-          );
-        }),
-        catchError(error => {
-          console.error('Error loading place details.', error);
-          this.loadingError$.next(true);
-          return of(null);
+      this.place$ = combineLatest([
+        this.placesService.getPlace(paramMap.get('placeId')),
+        this.settingsService.getGoogleMapsAPIKey(),
+        this.authService.user$
+      ]).pipe(
+        map(([place, googleMapsAPIKey, user]) => {
+          const isBookable = user ? place.userId !== user.id : false;
+
+          // TODO: the backend should do this
+          place.location.staticMapImageUrl =
+            place.location.staticMapImageUrl + `&key=${googleMapsAPIKey}`;
+          return { place, isBookable };
         })
       );
     });

@@ -1,8 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { IonItemSliding } from '@ionic/angular';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
-import { map, withLatestFrom } from 'rxjs/operators';
+import { Observable, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { AuthService, PlacesService, Place } from '@app/core';
 
@@ -22,10 +22,12 @@ export class OffersPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.offers$ = this.placesService.places$.pipe(
-      withLatestFrom(this.authService.user$),
+    this.offers$ = combineLatest([
+      this.placesService.places$,
+      this.authService.user$
+    ]).pipe(
       map(([places, user]) => {
-        if (!places) {
+        if (!places || !user) {
           return null;
         }
         return places.filter(place => place.userId === user.id);
@@ -34,9 +36,7 @@ export class OffersPage implements OnInit {
   }
 
   ionViewWillEnter() {
-    this.placesService.fetchPlaces().subscribe(() => {
-      console.log('offersPage.fetchPlaces()');
-    });
+    this.placesService.fetchPlaces().subscribe(() => {});
   }
 
   async onEdit(offerId: string, slidingItem: IonItemSliding) {

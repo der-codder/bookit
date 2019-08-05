@@ -36,8 +36,10 @@ export class LocationPickerComponent implements OnInit {
     private modalCtrl: ModalController
   ) {}
 
-  async ngOnInit() {
-    this._googleMapsAPIKey = await this.settingsService.getGoogleMapsAPIKey();
+  ngOnInit() {
+    this.settingsService
+      .getGoogleMapsAPIKey()
+      .subscribe(apiKey => (this._googleMapsAPIKey = apiKey));
   }
 
   onPickLocation() {
@@ -128,7 +130,9 @@ export class LocationPickerComponent implements OnInit {
       )
       .subscribe(staticMapImageUrl => {
         pickedLocation.staticMapImageUrl = staticMapImageUrl;
-        this.selectedLocationImageUrl = staticMapImageUrl;
+
+        this.selectedLocationImageUrl =
+          staticMapImageUrl + `&key=${this._googleMapsAPIKey}`;
         this.isLoadingLocationImage = false;
         this.locationPick.emit(pickedLocation);
       });
@@ -154,8 +158,7 @@ export class LocationPickerComponent implements OnInit {
     return (
       'https://maps.googleapis.com/maps/api/staticmap?' +
       `center=${lat},${lng}&zoom=${zoom}&size=500x300&maptype=roadmap` +
-      `&markers=color:red%7Place:S%7C${lat},${lng}` +
-      `&key=${this._googleMapsAPIKey}`
+      `&markers=color:red%7Place:S%7C${lat},${lng}`
     );
   }
 }

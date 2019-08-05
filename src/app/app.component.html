@@ -14,7 +14,7 @@
             <ion-label>Discover Places</ion-label>
           </ion-item>
         </ion-menu-toggle>
-        <ion-menu-toggle *ngIf="authService.isAuthenticated | async">
+        <ion-menu-toggle *ngIf="authService.isAuthenticated$ | async">
           <ion-item lines="none" routerLink="/bookings">
             <ion-icon name="checkbox-outline" slot="start"></ion-icon>
             <ion-label>My Bookings</ion-label>

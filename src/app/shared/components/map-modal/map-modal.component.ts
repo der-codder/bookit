@@ -66,21 +66,21 @@ export class MapModalComponent implements OnInit, AfterViewInit, OnDestroy {
 
     return new Promise(async (resolve, reject) => {
       const script = document.createElement('script');
-      const googleMapsAPIKey = await this.settingsService.getGoogleMapsAPIKey();
+      this.settingsService.getGoogleMapsAPIKey().subscribe(googleMapsAPIKey => {
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}`;
+        script.async = true;
+        script.defer = true;
+        document.body.appendChild(script);
 
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsAPIKey}`;
-      script.async = true;
-      script.defer = true;
-      document.body.appendChild(script);
-
-      script.onload = () => {
-        const loadedGoogleModule = win.google;
-        if (loadedGoogleModule && loadedGoogleModule.maps) {
-          resolve(loadedGoogleModule.maps);
-        } else {
-          reject('Google maps SDK not available.');
-        }
-      };
+        script.onload = () => {
+          const loadedGoogleModule = win.google;
+          if (loadedGoogleModule && loadedGoogleModule.maps) {
+            resolve(loadedGoogleModule.maps);
+          } else {
+            reject('Google maps SDK not available.');
+          }
+        };
+      });
     });
   }
 
