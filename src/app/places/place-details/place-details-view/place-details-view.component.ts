@@ -56,8 +56,6 @@ export class PlaceDetailsViewComponent implements OnInit {
       return;
     }
 
-    console.log(this.place);
-
     const modalEl = await this.modalCtrl.create({
       component: MapModalComponent,
       componentProps: {
