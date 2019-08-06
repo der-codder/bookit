@@ -7,14 +7,14 @@
     </ion-header>
 
     <ion-content padding>
-      <ion-list>
+      <ion-list *ngIf="authService.isAuthenticated$ | async; else unauthenticated">
         <ion-menu-toggle>
           <ion-item lines="none" routerLink="/places/tabs/discover">
             <ion-icon name="business" slot="start"></ion-icon>
             <ion-label>Discover Places</ion-label>
           </ion-item>
         </ion-menu-toggle>
-        <ion-menu-toggle *ngIf="authService.isAuthenticated$ | async">
+        <ion-menu-toggle>
           <ion-item lines="none" routerLink="/bookings">
             <ion-icon name="checkbox-outline" slot="start"></ion-icon>
             <ion-label>My Bookings</ion-label>
@@ -22,8 +22,14 @@
         </ion-menu-toggle>
         <ion-menu-toggle>
           <ion-item lines="none" (click)="onLogout()" button>
-            <ion-icon name="exit" slot="start"></ion-icon>
+            <ion-icon name="log-out" slot="start"></ion-icon>
             <ion-label>Logout</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+        <ion-menu-toggle>
+          <ion-item lines="none" target="_blank" href="https://github.com/der-codder/bookit#bookit">
+            <ion-icon name="logo-github" slot="start"></ion-icon>
+            <ion-label>Github</ion-label>
           </ion-item>
         </ion-menu-toggle>
       </ion-list>
@@ -31,3 +37,20 @@
   </ion-menu>
   <ion-router-outlet main></ion-router-outlet>
 </ion-app>
+
+<ng-template #unauthenticated>
+  <ion-list>
+    <ion-menu-toggle>
+      <ion-item lines="none" routerLink="/auth">
+        <ion-icon name="log-in" slot="start"></ion-icon>
+        <ion-label>Login</ion-label>
+      </ion-item>
+    </ion-menu-toggle>
+    <ion-menu-toggle>
+      <ion-item lines="none" target="_blank" href="https://github.com/der-codder/bookit#bookit">
+        <ion-icon name="logo-github" slot="start"></ion-icon>
+        <ion-label>Github</ion-label>
+      </ion-item>
+    </ion-menu-toggle>
+  </ion-list>
+</ng-template>
