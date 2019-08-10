@@ -5,11 +5,13 @@
   "homepage": "https://ionicframework.com/",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "ng serve --aot=true --host=localhost --port=8100",
     "build": "ng build",
+    "build:prod": "ng build --prod --aot=true --base-href 'https://yuriity.github.io/bookit/' --outputHashing=all --extractCss=true --sourceMap=false --namedChunks=false --buildOptimizer=true --outputPath=www/",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "analyze": "npm run build:prod -- --stats-json && webpack-bundle-analyzer ./www/stats-es2015.json"
   },
   "private": true,
   "dependencies": {
@@ -61,7 +63,8 @@
     "protractor": "~5.4.0",
     "ts-node": "~8.1.0",
     "tslint": "~5.16.0",
-    "typescript": "~3.4.5"
+    "typescript": "~3.4.5",
+    "webpack-bundle-analyzer": "^3.4.1"
   },
   "description": "An Ionic project"
 }
