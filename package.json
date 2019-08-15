@@ -7,7 +7,7 @@
     "ng": "ng",
     "start": "ng serve --aot=true --host=localhost --port=8100",
     "build": "ng build",
-    "build:prod": "ng build --prod --aot=true --base-href 'https://yuriity.github.io/bookit/' --outputHashing=all --extractCss=true --sourceMap=false --namedChunks=false --buildOptimizer=true --outputPath=www/",
+    "build:prod": "ng build --prod --aot=true --base-href=https://yuriity.github.io/bookit/ --outputHashing=all --extractCss=true --sourceMap=false --namedChunks=false --buildOptimizer=true --outputPath=www/",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
