@@ -9,7 +9,7 @@ const routes: Routes = [
   {
     path: 'auth',
     loadChildren: () =>
-      import('./auth/auth.module').then(m => m.AuthPageModule),
+      import('./features/auth/auth.module').then(m => m.AuthPageModule),
     canLoad: [ReverseAuthGuard]
   },
   {
