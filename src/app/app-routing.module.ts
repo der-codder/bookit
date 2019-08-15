@@ -15,7 +15,7 @@ const routes: Routes = [
   {
     path: 'places',
     loadChildren: () =>
-      import('./places/places.module').then(m => m.PlacesPageModule)
+      import('./features/places/places.module').then(m => m.PlacesPageModule)
   },
   {
     path: 'bookings',
