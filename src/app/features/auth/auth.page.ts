@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { Router } from '@angular/router';
 import { LoadingController, AlertController } from '@ionic/angular';
@@ -9,7 +9,8 @@ import { AuthService, AuthResponseData } from '@app/core';
 @Component({
   selector: 'app-auth',
   templateUrl: './auth.page.html',
-  styleUrls: ['./auth.page.scss']
+  styleUrls: ['./auth.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AuthPage implements OnInit {
   isLoading = false;

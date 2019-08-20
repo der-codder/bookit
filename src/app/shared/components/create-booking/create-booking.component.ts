@@ -1,4 +1,10 @@
-import { Component, OnInit, Input, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  ViewChild,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
 
@@ -7,7 +13,8 @@ import { Place } from '@app/core';
 @Component({
   selector: 'app-create-booking',
   templateUrl: './create-booking.component.html',
-  styleUrls: ['./create-booking.component.scss']
+  styleUrls: ['./create-booking.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CreateBookingComponent implements OnInit {
   @Input() selectedPlace: Place;

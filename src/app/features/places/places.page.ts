@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
@@ -12,7 +12,8 @@ interface PlacesViewModel {
 @Component({
   selector: 'app-places',
   templateUrl: './places.page.html',
-  styleUrls: ['./places.page.scss']
+  styleUrls: ['./places.page.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlacesPage implements OnInit {
   placesViewModel$: Observable<PlacesViewModel>;

@@ -6,7 +6,8 @@ import {
   ElementRef,
   Renderer2,
   OnDestroy,
-  Input
+  Input,
+  ChangeDetectionStrategy
 } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 
@@ -15,7 +16,8 @@ import { SettingsService } from '@app/core';
 @Component({
   selector: 'app-map-modal',
   templateUrl: './map-modal.component.html',
-  styleUrls: ['./map-modal.component.scss']
+  styleUrls: ['./map-modal.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MapModalComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('map', { static: true }) mapElementRef: ElementRef;

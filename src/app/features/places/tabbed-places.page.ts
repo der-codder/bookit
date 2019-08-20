@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-tabbed-places',
@@ -15,7 +15,8 @@ import { Component, OnInit } from '@angular/core';
         </ion-tab-button>
       </ion-tab-bar>
     </ion-tabs>
-  `
+  `,
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TabbedPlacesPage implements OnInit {
   constructor() {}

@@ -1,4 +1,11 @@
-import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Output,
+  EventEmitter,
+  Input,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Capacitor, Plugins } from '@capacitor/core';
 import {
@@ -17,7 +24,8 @@ import { environment } from '../../../../environments/environment';
 @Component({
   selector: 'app-location-picker',
   templateUrl: './location-picker.component.html',
-  styleUrls: ['./location-picker.component.scss']
+  styleUrls: ['./location-picker.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LocationPickerComponent implements OnInit {
   private _googleMapsAPIKey: string;

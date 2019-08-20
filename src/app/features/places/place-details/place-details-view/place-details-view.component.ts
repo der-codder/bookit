@@ -1,16 +1,22 @@
-import { Component, OnInit, Input } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  Input,
+  ChangeDetectionStrategy
+} from '@angular/core';
 import {
   ModalController,
   ActionSheetController,
   LoadingController
 } from '@ionic/angular';
 
-import { Place, PlaceLocation, BookingService } from '@app/core';
+import { Place, BookingService } from '@app/core';
 import { CreateBookingComponent, MapModalComponent } from '@app/shared';
 
 @Component({
   selector: 'app-place-details-view',
-  templateUrl: './place-details-view.component.html'
+  templateUrl: './place-details-view.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlaceDetailsViewComponent implements OnInit {
   @Input() place: Place;
