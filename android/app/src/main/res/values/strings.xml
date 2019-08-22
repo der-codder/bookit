@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">PairBnB</string>
-    <string name="title_activity_main">PairBnB</string>
-    <string name="package_name">com.der-codder.ionic.bookit</string>
-    <string name="fileprovider_authority">com.der-codder.ionic.bookit.fileprovider</string>
-    <string name="custom_url_scheme">com.der-codder.ionic.bookit</string>
+    <string name="app_name">BookIt</string>
+    <string name="title_activity_main">BookIt</string>
+    <string name="package_name">com.yuriity.ionic.bookit</string>
+    <string name="fileprovider_authority">com.yuriity.ionic.bookit.fileprovider</string>
+    <string name="custom_url_scheme">com.yuriity.ionic.bookit</string>
 </resources>
